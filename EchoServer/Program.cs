@@ -77,7 +77,13 @@ namespace EchoServer
                     System.Text.Encoding.UTF8.GetString(state.readBuff, 0, count);
                 byte[] sendBytes =
                     System.Text.Encoding.UTF8.GetBytes("echo " + receiveStr);
-                clientfd.Send(sendBytes);
+                
+                //聊天系统 广播给所有人
+                //clientfd.Send(sendBytes);
+                foreach (var client in clients.Keys)
+                {
+                    client.Send(sendBytes);
+                }
                 clientfd.BeginReceive(state.readBuff, 0, 1024, 0, ReceiveCallback, state);
 
             }

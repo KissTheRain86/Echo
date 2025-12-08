@@ -61,7 +61,9 @@ public class Echo : MonoBehaviour
             Socket socket = (Socket)ar.AsyncState;
             int count = socket.EndReceive(ar);
             Debug.Log("Socket recieve succ" + count);
-            receiveStr = System.Text.Encoding.UTF8.GetString(receiveBuff, 0, count);
+
+            string s = System.Text.Encoding.UTF8.GetString(receiveBuff, 0, count);
+            receiveStr = s + "\n" +receiveStr;
 
             //ReceiveText.text = receiveStr;//注意不能这样 后台线程合主线程混用了
             socket.BeginReceive(receiveBuff, 0, 1024, 0, ReceiveCallback, socket);
