@@ -846,7 +846,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   InputField: {fileID: 1481593469}
-  Text: {fileID: 805890943}
+  ReceiveText: {fileID: 805890943}
 --- !u!114 &997366211
 MonoBehaviour:
   m_ObjectHideFlags: 0
