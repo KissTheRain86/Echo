@@ -10,6 +10,9 @@ namespace EchoServer
         static Socket listenfd;
         //客户端Socket及状态信息
         static Dictionary<Socket, ClientState> clients = new();
+
+        //checkRead
+        static List<Socket> checkRead = new List<Socket>();
         public static void Main(string[] args)
         {
             // 建立连接socket          
@@ -25,22 +28,28 @@ namespace EchoServer
 
             while (true)
             {
-                //检查listenfd
-                if (listenfd.Poll(0, SelectMode.SelectRead))
+                //填充checkRead列表
+                checkRead.Clear();
+                checkRead.Add(listenfd);
+                foreach(ClientState s in clients.Values)
                 {
-                    ReadListenfd(listenfd);
+                    checkRead.Add(s.socket);
                 }
-                //检查clientfd
-                foreach (ClientState state in clients.Values)
+                //Select 多路复用 一次性检查多个socket是否可读、可写
+                Socket.Select(checkRead, null, null, 1000);
+                foreach (Socket s in checkRead)
                 {
-                    Socket clientfd = state.socket;
-                    if (clientfd.Poll(0, SelectMode.SelectRead))
+                    if(s == listenfd)
                     {
-                        if (!ReadClientfd(clientfd)) break;
+                        //负责监听的socket
+                        ReadListenfd(s);
+                    }
+                    else
+                    {
+                        //负责读的socket
+                        ReadClientfd(s);
                     }
                 }
-                //防止cpu占用过高
-                System.Threading.Thread.Sleep(1);
             }
         }
 

@@ -16,24 +16,21 @@ public class Echo : MonoBehaviour
     byte[] receiveBuff = new byte[1024];
     string receiveStr = "";
 
-
+    static List<Socket> checkRead = new List<Socket>();
     private void Update()
     {
         if (socket == null) return;
-        if (socket.Poll(0, SelectMode.SelectRead))
-        {
-            //如果有可读数据 读取
+        checkRead.Clear();
+        checkRead.Add(socket);
+        //select
+        Socket.Select(checkRead, null, null, 0);
+        //check
+       foreach(Socket s in checkRead){
             byte[] readBuff = new byte[1024];
             int count = socket.Receive(readBuff);
-            string recvStr = 
-                System.Text.Encoding.UTF8.GetString(readBuff, 0, count);
-            receiveStr = recvStr + "\n" + receiveStr;
-            ReceiveText.text = receiveStr;
+            string resvStr = System.Text.Encoding.UTF8.GetString(readBuff, 0, count);
+            ReceiveText.text = resvStr;
         }
-        
-        //注意socket的回调是在后台线程执行 不是在主线程执行的
-        //因此只能这样赋值
-        //ReceiveText.text = receiveStr;
     }
     public void Connection()
     {
